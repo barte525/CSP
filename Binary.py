@@ -27,14 +27,14 @@ class Binary:
             self.read_file()
         all_assignment: Optional[List[Dict[Tuple[int, int], int]]] = []
         if is_backtracking:
-            csp.backtracking(assignment=self.assignment, all_assignment=all_assignment,
+            result = csp.backtracking(assignment=self.assignment, all_assignment=all_assignment,
                              constraint_heuristic=constraint_heuristic,
                              domain_heuristic=domain_heuristic)
         else:
             connections = self.add_connections()
-            csp.forward_checking(connections=connections, assignment=self.assignment, all_assignment=all_assignment,
+            result = csp.forward_checking(connections=connections, assignment=self.assignment, all_assignment=all_assignment,
                                  constraint_heuristic=constraint_heuristic, domain_heuristic=domain_heuristic)
-        return all_assignment
+        return result
 
     def add_connections(self):
         connections: Dict[Tuple[int, int], List[Tuple[int, int]]] = {}
