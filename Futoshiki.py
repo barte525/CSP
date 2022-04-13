@@ -1,16 +1,17 @@
 from Csp import Csp
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, IO
 from FutoshikiConstraint import UniqueInRowAndColumn, OneGreaterThenSecond
 import numpy as np
 
 
 class Futoshiki:
     def __init__(self, n: int, file: str = '', assignment: Dict = {}):
-        self.n = n
-        self.file = file
-        self.assignment = assignment
+        self.n: int = n
+        self.file: str = file
+        self.assignment: Dict = assignment
 
-    def futoshiki(self, is_backtracking, constraint_heuristic, domain_heuristic) -> Optional[List[Dict[Tuple[int, int], int]]]:
+    def futoshiki(self, is_backtracking: bool, constraint_heuristic: bool, domain_heuristic: bool) -> \
+            Optional[List[Dict[Tuple[int, int], int]]]:
         variables: List[Tuple[int, int]] = []
         for x in range(self.n):
             for y in range(self.n):
@@ -27,15 +28,22 @@ class Futoshiki:
                 csp.add_constraint(OneGreaterThenSecond(constraint[0], constraint[1], self.n))
         all_assignment: Optional[List[Dict[Tuple[int, int], int]]] = []
         if is_backtracking:
-            result = csp.backtracking(assignment=self.assignment, all_assignment=all_assignment, constraint_heuristic=constraint_heuristic,
-                             domain_heuristic=domain_heuristic)
+            result: Optional[List[Dict[Tuple[int, int], int]]] = csp.backtracking(assignment=self.assignment,
+                                                                                  all_assignment=all_assignment,
+                                                                                  constraint_heuristic=
+                                                                                  constraint_heuristic,
+                                                                                  domain_heuristic=domain_heuristic)
         else:
             connections = self.add_connections()
-            result = csp.forward_checking(connections=connections, assignment=self.assignment, all_assignment=all_assignment,
-                                 constraint_heuristic=constraint_heuristic, domain_heuristic=domain_heuristic)
+            result: Optional[List[Dict[Tuple[int, int], int]]] = csp.forward_checking(connections=connections,
+                                                                                      assignment=self.assignment,
+                                                                                      all_assignment=all_assignment,
+                                                                                      constraint_heuristic=
+                                                                                      constraint_heuristic,
+                                                                                      domain_heuristic=domain_heuristic)
         return result
 
-    def add_connections(self):
+    def add_connections(self) -> Dict[Tuple[int, int], List[Tuple[int, int]]]:
         connections: Dict[Tuple[int, int], List[Tuple[int, int]]] = {}
         for x in range(self.n):
             for y in range(self.n):
@@ -48,16 +56,18 @@ class Futoshiki:
         return connections
 
     def print_solution(self, is_backtracking, constraint_heuristic, domain_heuristic) -> None:
-        all_assignment: Optional[List[Dict[Tuple[int, int], int]]] = self.futoshiki(is_backtracking, constraint_heuristic, domain_heuristic)
+        all_assignment: Optional[List[Dict[Tuple[int, int], int]]] = self.futoshiki(is_backtracking,
+                                                                                    constraint_heuristic,
+                                                                                    domain_heuristic)
         print(" Number of Solutions:", len(all_assignment))
         for solution in all_assignment:
-            arr = np.zeros(shape=(self.n, self.n), dtype=int)
+            arr: np.array = np.zeros(shape=(self.n, self.n), dtype=int)
             for variable in solution.keys():
                 arr[variable] = solution[variable]
             print(arr)
 
     def read_file(self) -> List[Tuple[Tuple[int, int], Tuple[int, int]]]:
-        f = open(self.file, "r")
+        f: IO = open(self.file, "r")
         constraint_to_add: List[Tuple[Tuple[int, int], Tuple[int, int]]] = []
         for i in range(0, self.n * 2):
             row: str = f.readline()

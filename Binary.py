@@ -1,16 +1,16 @@
 from Csp import Csp
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, IO
 from BinaryConstraint import ThreeInRowConstraint, SameNumberOfZerosAndOnes, UniqueRowsAndColumns
 import numpy as np
 
 
 class Binary:
-    def __init__(self, n: int, file: str = '', assignment: Dict={}):
-        self.n = n
-        self.file = file
-        self.assignment = assignment
+    def __init__(self, n: int, file: str = '', assignment: Dict= {}):
+        self.n: int = n
+        self.file: str = file
+        self.assignment: Dict = assignment
 
-    def binary(self, is_backtracking, constraint_heuristic, domain_heuristic) -> Optional[List[Dict[Tuple[int, int], int]]]:
+    def binary(self, is_backtracking: bool, constraint_heuristic: bool, domain_heuristic: bool) -> Optional[List[Dict[Tuple[int, int], int]]]:
         variables: List[Tuple[int, int]] = []
         for x in range(self.n):
             for y in range(self.n):
@@ -27,16 +27,22 @@ class Binary:
             self.read_file()
         all_assignment: Optional[List[Dict[Tuple[int, int], int]]] = []
         if is_backtracking:
-            result = csp.backtracking(assignment=self.assignment, all_assignment=all_assignment,
-                             constraint_heuristic=constraint_heuristic,
-                             domain_heuristic=domain_heuristic)
+            result: Optional[List[Dict[Tuple[int, int], int]]] = csp.backtracking(assignment=self.assignment,
+                                                                                  all_assignment=all_assignment,
+                                                                                  constraint_heuristic=
+                                                                                  constraint_heuristic,
+                                                                                  domain_heuristic=domain_heuristic)
         else:
-            connections = self.add_connections()
-            result = csp.forward_checking(connections=connections, assignment=self.assignment, all_assignment=all_assignment,
-                                 constraint_heuristic=constraint_heuristic, domain_heuristic=domain_heuristic)
+            connections: Dict[Tuple[int, int], List[Tuple[int, int]]] = self.add_connections()
+            result: Optional[List[Dict[Tuple[int, int], int]]] = csp.forward_checking(connections=connections,
+                                                                                      assignment=self.assignment,
+                                                                                      all_assignment=all_assignment,
+                                                                                      constraint_heuristic=
+                                                                                      constraint_heuristic,
+                                                                                      domain_heuristic=domain_heuristic)
         return result
 
-    def add_connections(self):
+    def add_connections(self) -> Dict[Tuple[int, int], List[Tuple[int, int]]]:
         connections: Dict[Tuple[int, int], List[Tuple[int, int]]] = {}
         for x in range(self.n):
             for y in range(self.n):
@@ -48,19 +54,19 @@ class Binary:
                         connections[(x, y)].append((i, y))
         return connections
 
-    def print_solution(self, is_backtracking, constraint_heuristic, domain_heuristic) -> None:
+    def print_solution(self, is_backtracking: bool, constraint_heuristic: bool, domain_heuristic: bool) -> None:
         all_assignment: Optional[List[Dict[Tuple[int, int], int]]] = self.binary(is_backtracking,
                                                                                  constraint_heuristic,
                                                                                  domain_heuristic)
         print(" Number of Solutions:", len(all_assignment))
         for solution in all_assignment:
-            arr = np.zeros(shape=(self.n, self.n), dtype=int)
+            arr: np.array = np.zeros(shape=(self.n, self.n), dtype=int)
             for variable in solution.keys():
                 arr[variable] = solution[variable]
             print(arr)
 
-    def read_file(self):
-        f = open(self.file, "r")
+    def read_file(self) -> None:
+        f: IO = open(self.file, "r")
         for i in range(self.n):
             row = f.readline()
             for j in range(len(row)):

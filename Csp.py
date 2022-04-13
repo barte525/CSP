@@ -1,6 +1,5 @@
 from typing import Dict, List, Optional
 from Constraint import Constraint, V, D
-import random
 
 
 class Csp:
@@ -64,7 +63,7 @@ class Csp:
                        visited_nodes: List[int] = [0], domain_heuristic=True) -> Optional[V]:
         if len(assignment) == len(self.variables):
             all_assignment.append(assignment)
-            return all_assignment
+            return
         if domain_heuristic:
             self.domains_heuristics(assignment)
         unassigned: List[V] = [v for v in self.variables if v not in assignment]
@@ -92,10 +91,11 @@ class Csp:
         self.connections = []
         return visited_nodes[0]
 
-    def __forward_checking(self, all_assignment: List[Dict[V, D]] = [], assignment: Dict[V, D] = {}, visited_nodes: List[int] = [0]) -> Optional[V]:
+    def __forward_checking(self, all_assignment: List[Dict[V, D]] = [], assignment: Dict[V, D] = {},
+                           visited_nodes: List[int] = [0]) -> Optional[V]:
         if len(assignment) == len(self.variables):
             all_assignment.append(assignment)
-            return all_assignment
+            return
         unassigned: List[V] = [v for v in self.variables if v not in assignment]
         first: V = unassigned[0]
         for value in self.curr_domains[first]:
@@ -110,13 +110,13 @@ class Csp:
                         return result
                 self.__revert_deleted(first)
 
-    def __extract_domains(self, first, local_assignment):
-        flag = True
+    def __extract_domains(self, first: V, local_assignment: Dict[V, D]) -> bool:
+        flag: bool = True
         for value in self.connections[first]:
             if value is not None:
-                to_remove = []
+                to_remove: List = []
                 for domain in self.curr_domains[value]:
-                    local_assignment2 = local_assignment.copy()
+                    local_assignment2: Dict[V, D] = local_assignment.copy()
                     local_assignment2[value] = domain
                     if not self.consistent(value, local_assignment2):
                         to_remove.append(domain)
@@ -129,7 +129,7 @@ class Csp:
                     break
         return flag
 
-    def __revert_deleted(self, first):
+    def __revert_deleted(self, first: V) -> None:
         for deleted in self.deleted[first]:
             self.curr_domains[deleted].extend(self.deleted[first][deleted])
             self.deleted[first][deleted] = []
